@@ -351,7 +351,7 @@ export default class ImageViewer extends React.Component<Props, State> {
                   // this.scale = this.scale - diffY / 1000;
                   // this.animatedScale.setValue(this.scale);
                   if (this.props.swipeDownThreshold) {
-                    this.opacity = this.opacity - (diffY / (this.props.swipeDownThreshold * 1.5));
+                    this.opacity = this.opacity - (diffY / (this.props.swipeDownThreshold));
                     this.animatedOpacity.setValue(this.opacity);
                   }
                 }
