@@ -32,10 +32,6 @@ export default class ImageViewer extends React.Component<Props, State> {
   private zoomLastDistance: number | null = null;
   private zoomCurrentDistance = 0;
 
-  // animated opacity
-  private opacity = 1;
-  private animatedOpacity = new Animated.Value(1);
-
   // 图片手势处理
   private imagePanResponder: PanResponderInstance | null = null;
 
@@ -78,116 +74,7 @@ export default class ImageViewer extends React.Component<Props, State> {
   // 是否在左右滑
   private isHorizontalWrap = false;
 
-  public resetScale = () => {
-    this.positionX = 0;
-    this.positionY = 0;
-    this.scale = 1;
-    this.animatedScale.setValue(1);
-  };
-
-  public panResponderReleaseResolve = () => {
-    // 判断是否是 swipeDown
-    if (this.props.enableSwipeDown && this.props.swipeDownThreshold) {
-      if (this.swipeDownOffset > this.props.swipeDownThreshold) {
-        if (this.props.onSwipeDown) {
-          this.props.onSwipeDown();
-        }
-        // Stop reset.
-        return;
-      }
-    }
-
-    if (this.props.enableCenterFocus && this.scale < 1) {
-      // 如果缩放小于1，强制重置为 1
-      this.scale = 1;
-      Animated.timing(this.animatedScale, {
-        toValue: this.scale,
-        duration: 100
-      }).start();
-    }
-
-    if (this.props.enableCenterFocus && this.opacity < 1) {
-      // 如果缩放小于1，强制重置为 1
-      this.opacity = 1;
-      Animated.timing(this.animatedOpacity, {
-        toValue: this.opacity,
-        duration: 100
-      }).start();
-    }
-
-    if (this.props.imageWidth * this.scale <= this.props.cropWidth) {
-      // 如果图片宽度小于盒子宽度，横向位置重置
-      this.positionX = 0;
-      Animated.timing(this.animatedPositionX, {
-        toValue: this.positionX,
-        duration: 100
-      }).start();
-    }
-
-    if (this.props.imageHeight * this.scale <= this.props.cropHeight) {
-      // 如果图片高度小于盒子高度，纵向位置重置
-      this.positionY = 0;
-      Animated.timing(this.animatedPositionY, {
-        toValue: this.positionY,
-        duration: 100
-      }).start();
-    }
-
-    // 横向肯定不会超出范围，由拖拽时控制
-    // 如果图片高度大于盒子高度，纵向不能出现黑边
-    if (this.props.imageHeight * this.scale > this.props.cropHeight) {
-      // 纵向能容忍的绝对值
-      const verticalMax = (this.props.imageHeight * this.scale - this.props.cropHeight) / 2 / this.scale;
-      if (this.positionY < -verticalMax) {
-        this.positionY = -verticalMax;
-      } else if (this.positionY > verticalMax) {
-        this.positionY = verticalMax;
-      }
-      Animated.timing(this.animatedPositionY, {
-        toValue: this.positionY,
-        duration: 100
-      }).start();
-    }
-
-    if (this.props.imageWidth * this.scale > this.props.cropWidth) {
-      // 纵向能容忍的绝对值
-      const horizontalMax = (this.props.imageWidth * this.scale - this.props.cropWidth) / 2 / this.scale;
-      if (this.positionX < -horizontalMax) {
-        this.positionX = -horizontalMax;
-      } else if (this.positionX > horizontalMax) {
-        this.positionX = horizontalMax;
-      }
-      Animated.timing(this.animatedPositionX, {
-        toValue: this.positionX,
-        duration: 100
-      }).start();
-    }
-
-    // 拖拽正常结束后,如果没有缩放,直接回到0,0点
-    if (this.props.enableCenterFocus && this.scale === 1) {
-      this.positionX = 0;
-      this.positionY = 0;
-      Animated.timing(this.animatedPositionX, {
-        toValue: this.positionX,
-        duration: 100
-      }).start();
-      Animated.timing(this.animatedPositionY, {
-        toValue: this.positionY,
-        duration: 100
-      }).start();
-    }
-
-    // 水平溢出量置空
-    this.horizontalWholeOuterCounter = 0;
-
-    // swipeDown 溢出量置空
-    this.swipeDownOffset = 0;
-
-    this.imageDidMove('onPanResponderRelease');
-  };
-
-  public componentDidMount() {
-
+  public componentWillMount() {
     this.imagePanResponder = PanResponder.create({
       // 要求成为响应者：
       onStartShouldSetPanResponder: () => true,
@@ -457,10 +344,8 @@ export default class ImageViewer extends React.Component<Props, State> {
                   this.animatedPositionY.setValue(this.positionY);
 
                   // 越到下方，缩放越小
-                  // this.scale = this.scale - diffY / 1000;
-                  // this.animatedScale.setValue(this.scale);
-                  this.opacity = this.opacity - diffY / 1000;
-                  this.animatedOpacity.setValue(this.opacity);
+                  this.scale = this.scale - diffY / 1000;
+                  this.animatedScale.setValue(this.scale);
                 }
               }
             }
@@ -573,7 +458,108 @@ export default class ImageViewer extends React.Component<Props, State> {
         //
       }
     });
+  }
 
+  public resetScale = () => {
+    this.positionX = 0;
+    this.positionY = 0;
+    this.scale = 1;
+    this.animatedScale.setValue(1);
+  };
+
+  public panResponderReleaseResolve = () => {
+    // 判断是否是 swipeDown
+    if (this.props.enableSwipeDown && this.props.swipeDownThreshold) {
+      if (this.swipeDownOffset > this.props.swipeDownThreshold) {
+        if (this.props.onSwipeDown) {
+          this.props.onSwipeDown();
+        }
+        // Stop reset.
+        return;
+      }
+    }
+
+    if (this.props.enableCenterFocus && this.scale < 1) {
+      // 如果缩放小于1，强制重置为 1
+      this.scale = 1;
+      Animated.timing(this.animatedScale, {
+        toValue: this.scale,
+        duration: 100
+      }).start();
+    }
+
+    if (this.props.imageWidth * this.scale <= this.props.cropWidth) {
+      // 如果图片宽度小于盒子宽度，横向位置重置
+      this.positionX = 0;
+      Animated.timing(this.animatedPositionX, {
+        toValue: this.positionX,
+        duration: 100
+      }).start();
+    }
+
+    if (this.props.imageHeight * this.scale <= this.props.cropHeight) {
+      // 如果图片高度小于盒子高度，纵向位置重置
+      this.positionY = 0;
+      Animated.timing(this.animatedPositionY, {
+        toValue: this.positionY,
+        duration: 100
+      }).start();
+    }
+
+    // 横向肯定不会超出范围，由拖拽时控制
+    // 如果图片高度大于盒子高度，纵向不能出现黑边
+    if (this.props.imageHeight * this.scale > this.props.cropHeight) {
+      // 纵向能容忍的绝对值
+      const verticalMax = (this.props.imageHeight * this.scale - this.props.cropHeight) / 2 / this.scale;
+      if (this.positionY < -verticalMax) {
+        this.positionY = -verticalMax;
+      } else if (this.positionY > verticalMax) {
+        this.positionY = verticalMax;
+      }
+      Animated.timing(this.animatedPositionY, {
+        toValue: this.positionY,
+        duration: 100
+      }).start();
+    }
+
+    if (this.props.imageWidth * this.scale > this.props.cropWidth) {
+      // 纵向能容忍的绝对值
+      const horizontalMax = (this.props.imageWidth * this.scale - this.props.cropWidth) / 2 / this.scale;
+      if (this.positionX < -horizontalMax) {
+        this.positionX = -horizontalMax;
+      } else if (this.positionX > horizontalMax) {
+        this.positionX = horizontalMax;
+      }
+      Animated.timing(this.animatedPositionX, {
+        toValue: this.positionX,
+        duration: 100
+      }).start();
+    }
+
+    // 拖拽正常结束后,如果没有缩放,直接回到0,0点
+    if (this.props.enableCenterFocus && this.scale === 1) {
+      this.positionX = 0;
+      this.positionY = 0;
+      Animated.timing(this.animatedPositionX, {
+        toValue: this.positionX,
+        duration: 100
+      }).start();
+      Animated.timing(this.animatedPositionY, {
+        toValue: this.positionY,
+        duration: 100
+      }).start();
+    }
+
+    // 水平溢出量置空
+    this.horizontalWholeOuterCounter = 0;
+
+    // swipeDown 溢出量置空
+    this.swipeDownOffset = 0;
+
+    this.imageDidMove('onPanResponderRelease');
+  };
+
+  public componentDidMount() {
     if (this.props.centerOn) {
       this.centerOn(this.props.centerOn);
     }
@@ -650,8 +636,6 @@ export default class ImageViewer extends React.Component<Props, State> {
     this.animatedPositionX.setValue(this.positionX);
     this.positionY = 0;
     this.animatedPositionY.setValue(this.positionY);
-    this.opacity = 1;
-    this.animatedOpacity.setValue(this.opacity);
   }
 
   public render() {
@@ -665,9 +649,8 @@ export default class ImageViewer extends React.Component<Props, State> {
         },
         {
           translateY: this.animatedPositionY
-        },
-      ],
-      opacity: this.animatedOpacity
+        }
+      ]
     };
 
     const parentStyles = StyleSheet.flatten(this.props.style);
