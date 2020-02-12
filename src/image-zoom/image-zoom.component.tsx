@@ -32,6 +32,10 @@ export default class ImageViewer extends React.Component<Props, State> {
   private zoomLastDistance: number | null = null;
   private zoomCurrentDistance = 0;
 
+  // animated opacity
+  private opacity = 1;
+  private animatedOpacity = new Animated.Value(1);
+
   // 图片手势处理
   private imagePanResponder: PanResponderInstance | null = null;
 
@@ -344,8 +348,11 @@ export default class ImageViewer extends React.Component<Props, State> {
                   this.animatedPositionY.setValue(this.positionY);
 
                   // 越到下方，缩放越小
-                  this.scale = this.scale - diffY / 1000;
-                  this.animatedScale.setValue(this.scale);
+                  // this.scale = this.scale - diffY / 1000;
+                  // this.animatedScale.setValue(this.scale);
+                  this.opacity = this.opacity - diffY / 1000;
+                  this.animatedOpacity.setValue(this.opacity);
+
                 }
               }
             }
@@ -484,6 +491,14 @@ export default class ImageViewer extends React.Component<Props, State> {
       this.scale = 1;
       Animated.timing(this.animatedScale, {
         toValue: this.scale,
+        duration: 100
+      }).start();
+    }
+
+    if (this.props.enableCenterFocus && this.opacity < 1) {
+      this.opacity = 1;
+      Animated.timing(this.animatedOpacity, {
+        toValue: this.opacity,
         duration: 100
       }).start();
     }
@@ -636,6 +651,8 @@ export default class ImageViewer extends React.Component<Props, State> {
     this.animatedPositionX.setValue(this.positionX);
     this.positionY = 0;
     this.animatedPositionY.setValue(this.positionY);
+    this.opacity = 1;
+    this.animatedOpacity.setValue(this.opacity);
   }
 
   public render() {
@@ -650,7 +667,8 @@ export default class ImageViewer extends React.Component<Props, State> {
         {
           translateY: this.animatedPositionY
         }
-      ]
+      ],
+      opacity: this.animatedOpacity
     };
 
     const parentStyles = StyleSheet.flatten(this.props.style);
