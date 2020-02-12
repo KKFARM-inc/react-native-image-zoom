@@ -350,9 +350,10 @@ export default class ImageViewer extends React.Component<Props, State> {
                   // 越到下方，缩放越小
                   // this.scale = this.scale - diffY / 1000;
                   // this.animatedScale.setValue(this.scale);
-                  this.opacity = this.opacity - diffY / 1000;
-                  this.animatedOpacity.setValue(this.opacity);
-
+                  if (this.props.swipeDownThreshold) {
+                    this.opacity = this.opacity - (diffY / this.props.swipeDownThreshold);
+                    this.animatedOpacity.setValue(this.opacity);
+                  }
                 }
               }
             }
