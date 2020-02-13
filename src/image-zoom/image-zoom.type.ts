@@ -92,6 +92,11 @@ export class Props {
   public swipeDownThreshold?: number = 230;
 
   /**
+   * threshold for firing swipe down background fade
+   */
+  public backgroundFadeThreshold?: number = 230;
+
+  /**
    * for enabling vertical movement if user doesn't want it
    */
   public enableSwipeDown?: boolean = false;

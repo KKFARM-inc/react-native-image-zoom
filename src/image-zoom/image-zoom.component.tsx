@@ -350,8 +350,8 @@ export default class ImageViewer extends React.Component<Props, State> {
                   // 越到下方，缩放越小
                   // this.scale = this.scale - diffY / 1000;
                   // this.animatedScale.setValue(this.scale);
-                  if (this.props.swipeDownThreshold) {
-                    this.opacity = this.opacity - (diffY / (this.props.swipeDownThreshold));
+                  if (this.props.backgroundFadeThreshold) {
+                    this.opacity = this.opacity - (diffY / (this.props.backgroundFadeThreshold));
                     this.animatedOpacity.setValue(this.opacity);
                   }
                 }
@@ -669,10 +669,14 @@ export default class ImageViewer extends React.Component<Props, State> {
           translateY: this.animatedPositionY
         }
       ],
-      opacity: this.animatedOpacity
     };
 
     const parentStyles = StyleSheet.flatten(this.props.style);
+
+    const bgColor = this.animatedOpacity.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['rgba(0,0,0,0)', 'rgba(0,0,0,1)'],
+    });
 
     return (
       <Animated.View
@@ -681,7 +685,7 @@ export default class ImageViewer extends React.Component<Props, State> {
           ...parentStyles,
           width: this.props.cropWidth,
           height: this.props.cropHeight,
-          opacity: this.animatedOpacity
+          backgroundColor: bgColor,
         }}
         {...this.imagePanResponder!.panHandlers}
       >
