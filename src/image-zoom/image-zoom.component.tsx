@@ -481,10 +481,16 @@ export default class ImageViewer extends React.Component<Props, State> {
       if (this.swipeDownOffset > this.props.swipeDownThreshold) {
         if (this.props.onSwipeDown) {
           // animated to the end when release and ready to close
-          Animated.timing(this.animatedPositionY, {
-            toValue: this.props.cropHeight,
-            duration: 200,
-          }).start(() => {
+          Animated.parallel([
+            Animated.timing(this.animatedPositionY, {
+              toValue: this.props.cropHeight,
+              duration: 200,
+            }),
+            Animated.timing(this.animatedOpacity, {
+              toValue: 0,
+              duration: 200,
+            }),
+          ]).start(() => {
             if (this.props.onSwipeDown) {
               this.props.onSwipeDown();
             }
