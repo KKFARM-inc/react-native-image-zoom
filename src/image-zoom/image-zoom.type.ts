@@ -179,6 +179,13 @@ export class Props {
   public onSwipeDown?: () => void = () => {
     //
   };
+
+  /**
+   * function that fires when user is swiping down
+   */
+  public onSwipingDown?: (offsetY?: number) => void = () => {
+    //
+  };
 }
 
 export class State {
