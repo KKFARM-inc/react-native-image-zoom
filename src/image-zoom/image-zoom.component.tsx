@@ -353,7 +353,7 @@ export default class ImageViewer extends React.Component<Props, State> {
                   if (this.props.backgroundFadeThreshold) {
                     this.opacity = this.opacity - (diffY / (this.props.backgroundFadeThreshold));
                     // this.animatedOpacity.setValue(this.opacity);
-                    if(this.props.onSwipingDown){
+                    if(this.props.onSwipingDown && this.opacity != null){
                       this.props.onSwipingDown(this.opacity);
                     }
                   }
